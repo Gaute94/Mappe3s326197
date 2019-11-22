@@ -13,6 +13,7 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 import org.json.JSONArray;
@@ -21,6 +22,7 @@ import org.json.JSONObject;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
+import java.lang.reflect.Array;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
@@ -32,7 +34,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private GoogleMap mMap;
     TextView textView;
     private List<Room> rooms = new ArrayList<>();
-
+    private List<LatLng> allPoints = new ArrayList<>();
+    Marker currentMarker = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,14 +53,17 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         task.execute("http://student.cs.hioa.no/~s326197/getRooms.php");
 
 
+
     }
+
 
     public void addMarker(View view){
         for(Room room : rooms){
             Log.d("MapsActivity", "Room names: " + room.getName());
             mMap.addMarker(new MarkerOptions()
                     .position(new LatLng(room.getGeoLat(), room.getGeoLng()))
-                    .title("Added a marker!"));
+                    .title("Added a marker!"))
+                    .setTag(room);
         }
 
     }
@@ -86,6 +92,38 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 .title("Hello world"));
 
 
+        mMap.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
+            @Override
+            public void onMapClick(LatLng point) {
+                Log.d("MapsActivity", "inside onMapClick");
+
+                allPoints.add(point);
+                //mMap.clear();
+                if (currentMarker!=null) {
+                    currentMarker.remove();
+                    currentMarker=null;
+                }
+                if(currentMarker == null) {
+                    currentMarker = mMap.addMarker(new MarkerOptions().position(point));
+                }
+            }
+        });
+
+
+        mMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
+
+            @Override
+            public boolean onMarkerClick(Marker arg0) {
+
+                if(arg0.getTag() != null){
+                    Log.d("MapsActivity", "This is a room");
+                }else{
+                    Log.d("MapsActivity", "This marker does not have a tag. It can become a room.");
+                }
+                return true;
+
+            }
+        });
     }
 
 
