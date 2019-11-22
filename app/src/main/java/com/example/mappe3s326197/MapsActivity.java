@@ -4,6 +4,8 @@ import androidx.fragment.app.FragmentActivity;
 
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.util.Log;
+import android.view.View;
 import android.widget.TextView;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -21,11 +23,17 @@ import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
 
     private GoogleMap mMap;
     TextView textView;
+    private List<Room> rooms = new ArrayList<>();
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -33,11 +41,25 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
-        mapFragment.getMapAsync(this);
+        if (mapFragment != null) {
+            mapFragment.getMapAsync(this);
+        }
 
         //textView = (TextView) findViewById(R.id.jsontext);
         GetJSON task = new GetJSON();
-        task.execute(new String[] {"https://www.student.cs.hioa.no/~s326197/getRooms.php"});
+        task.execute("http://student.cs.hioa.no/~s326197/getRooms.php");
+
+
+    }
+
+    public void addMarker(View view){
+        for(Room room : rooms){
+            Log.d("MapsActivity", "Room names: " + room.getName());
+            mMap.addMarker(new MarkerOptions()
+                    .position(new LatLng(room.getGeoLat(), room.getGeoLng()))
+                    .title("Added a marker!"));
+        }
+
     }
 
 
@@ -67,13 +89,14 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     }
 
 
-    private class GetJSON extends AsyncTask<String, Void, String> {
+    private class GetJSON extends AsyncTask<String, Void, List<Room>> {
 
         JSONObject jsonObject;
 
         @Override
-        protected String doInBackground(String... urls){
+        protected List<Room> doInBackground(String... urls){
             String retur = "";
+            List<Room> rooms = new ArrayList<>();
             String s = "";
             String output = "";
             for (String url : urls){
@@ -99,24 +122,48 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                         for(int i = 0; i < mat.length(); i++){
                             JSONObject jsonObject = mat.getJSONObject(i);
                             String name = jsonObject.getString("name");
-                            retur = retur + name + "\n";
+                            String desc = jsonObject.getString("description");
+                            Float geoLat = (float)jsonObject.getDouble("geoLat");
+                            Float geoLng = (float)jsonObject.getDouble("geoLng");
+
+
+                            Log.d("MapsActivity", "name in Background: " + name);
+                            Log.d("MapsActivity", "desc in Background: " + desc);
+                            Log.d("MapsActivity","geoLat in Background: " + geoLat);
+                            Log.d("MapsActivity","geoLng in Background: " + geoLng);
+
+                            Room room = new Room();
+                            room.setName(name);
+                            room.setDesc(desc);
+                            room.setGeoLat(geoLat);
+                            room.setGeoLng(geoLng);
+
+                            rooms.add(room);
+                            //retur = retur + name + "\n";
                         }
-                        return retur;
+                        return rooms;
                     } catch (JSONException e){
                         e.printStackTrace();
                     }
-                    return retur;
+                    return rooms;
                 } catch (Exception e){
-                    return "Noe gikk feil";
+                    e.printStackTrace();
+                    return null;
                 }
             }
-            return retur;
+            return rooms;
         }
 
         @Override
-        protected void onPostExecute(String ss){
+        protected void onPostExecute(List<Room> ss){
             //textView.setText(ss);
-            System.out.println("Get JSON: " + ss);
+            rooms.addAll(ss);
+            for(Room room : ss){
+                Log.d("MapsActivity","name in Execute: " + room.getName());
+                Log.d("MapsActivity","desc in Execute: " + room.getDesc());
+                Log.d("MapsActivity","geoLat in Execute: " + room.getGeoLat());
+                Log.d("MapsActivity","geoLng in Execute: " + room.getGeoLng());
+            }
         }
     }
 
