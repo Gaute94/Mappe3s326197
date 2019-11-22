@@ -60,10 +60,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     public void addMarker(View view){
         for(Room room : rooms){
             Log.d("MapsActivity", "Room names: " + room.getName());
-            mMap.addMarker(new MarkerOptions()
+            Marker marker = mMap.addMarker(new MarkerOptions()
                     .position(new LatLng(room.getGeoLat(), room.getGeoLng()))
-                    .title("Added a marker!"))
-                    .setTag(room);
+                    .title(room.getName())
+                    .snippet(room.getDesc()));
+            marker.setTag(room.getId());
         }
 
     }
@@ -107,15 +108,17 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     currentMarker = mMap.addMarker(new MarkerOptions().position(point));
                 }
             }
+
         });
 
 
         mMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
 
             @Override
-            public boolean onMarkerClick(Marker arg0) {
+            public boolean onMarkerClick(Marker marker) {
 
-                if(arg0.getTag() != null){
+                if(marker.getTag() != null){
+                    marker.showInfoWindow();
                     Log.d("MapsActivity", "This is a room");
                 }else{
                     Log.d("MapsActivity", "This marker does not have a tag. It can become a room.");
@@ -159,6 +162,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                         JSONArray mat = new JSONArray(output);
                         for(int i = 0; i < mat.length(); i++){
                             JSONObject jsonObject = mat.getJSONObject(i);
+                            int id = jsonObject.getInt("id");
                             String name = jsonObject.getString("name");
                             String desc = jsonObject.getString("description");
                             Float geoLat = (float)jsonObject.getDouble("geoLat");
@@ -171,6 +175,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                             Log.d("MapsActivity","geoLng in Background: " + geoLng);
 
                             Room room = new Room();
+                            room.setId(id);
                             room.setName(name);
                             room.setDesc(desc);
                             room.setGeoLat(geoLat);
@@ -203,6 +208,16 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 Log.d("MapsActivity","geoLng in Execute: " + room.getGeoLng());
             }
         }
+    }
+
+    public Room findRoomById(int id){
+        for(Room room : rooms){
+            if (room.getId() == id){
+                return room;
+            }
+        }
+        Log.d("MapsActivity", "No room with that ID");
+        return null;
     }
 
 }

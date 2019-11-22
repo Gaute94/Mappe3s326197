@@ -1,13 +1,19 @@
 package com.example.mappe3s326197;
 
 public class Room {
-
+    private int id;
     private String name;
     private String desc;
     private float geoLat;
     private float geoLng;
 
+    public int getId(){
+        return id;
+    }
 
+    public void setId(int id){
+        this.id = id;
+    }
     public String getName() {
         return name;
     }
