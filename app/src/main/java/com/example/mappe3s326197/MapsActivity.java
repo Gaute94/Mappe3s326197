@@ -37,8 +37,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     TextView textView;
     private List<Room> rooms = new ArrayList<>();
     private List<Reservation> reservations = new ArrayList<>();
-    private List<LatLng> allPoints = new Ar-rayList<>();
+    private List<LatLng> allPoints = new ArrayList<>();
     private List<Building> buildings = new ArrayList<>();
+    private JsonData jsonData = new JsonData();
     Marker currentMarker = null;
 
     @Override
@@ -54,7 +55,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         //textView = (TextView) findViewById(R.id.jsontext);
         GetJSON task = new GetJSON();
-        task.execute("http://student.cs.hioa.no/~s326197/getRooms.php");
+        task.execute("http://student.cs.hioa.no/~s326197/getJson.php");
 
 
 
@@ -158,14 +159,15 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     }
 
 
-    private class GetJSON extends AsyncTask<String, Void, List<Room>> {
+    private class GetJSON extends AsyncTask<String, Void, JsonData> {
 
         JSONObject jsonObject;
 
         @Override
-        protected List<Room> doInBackground(String... urls){
+        protected JsonData doInBackground(String... urls){
             String retur = "";
-            List<Room> rooms = new ArrayList<>();
+            JsonData jsonData = new JsonData();
+
             String s = "";
             String output = "";
             for (String url : urls){
@@ -187,7 +189,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
                     conn.disconnect();
                     try {
-
+                        Log.d("MapsActivity", "doInBackground: " + output);
                         JSONObject jsonObject = new JSONObject(output);
 
                         List<Building> allBuildings = new ArrayList<>();
@@ -247,6 +249,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                             }
                         }
 
+                        jsonData.setBuildings(allBuildings);
+                        jsonData.setRooms(allRooms);
+                        jsonData.setReservations(allReservations);
 
 
 
@@ -280,23 +285,22 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     } catch (JSONException e){
                         e.printStackTrace();
                     }
-                    return rooms;
+                    return jsonData;
                 } catch (Exception e){
                     e.printStackTrace();
                     return null;
                 }
             }
-            return rooms;
+            return jsonData;
         }
 
         @Override
-        protected void onPostExecute(List<Room> ss){
+        protected void onPostExecute(JsonData ss){
             //textView.setText(ss);
-            rooms.addAll(ss);
-            for(Room room : ss){
-                Log.d("MapsActivity","name in Execute: " + room.getName());
-                Log.d("MapsActivity","desc in Execute: " + room.getDesc());
-            }
+//            rooms.addAll(ss);
+            jsonData = ss;
+            jsonData.printAllData();
+
         }
     }
 
