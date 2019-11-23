@@ -26,7 +26,9 @@ import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
@@ -35,7 +37,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     TextView textView;
     private List<Room> rooms = new ArrayList<>();
     private List<Reservation> reservations = new ArrayList<>();
-    private List<LatLng> allPoints = new ArrayList<>();
+    private List<LatLng> allPoints = new Ar-rayList<>();
+    private List<Building> buildings = new ArrayList<>();
     Marker currentMarker = null;
 
     @Override
@@ -59,13 +62,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
 
     public void addMarker(View view){
-        for(Room room : rooms){
-            Log.d("MapsActivity", "Room names: " + room.getName());
+        for(Building building : buildings){
+            Log.d("MapsActivity", "Building Address: " + building.getAddress());
             Marker marker = mMap.addMarker(new MarkerOptions()
-                    .position(new LatLng(room.getGeoLat(), room.getGeoLng()))
-                    .title(room.getName())
-                    .snippet(room.getDesc()));
-            marker.setTag(room.getId());
+                    .position(new LatLng(building.getGeoLat(), building.getGeoLng()))
+                    .title(building.getAddress()));
+            marker.setTag(building.getId());
         }
 
     }
@@ -185,32 +187,96 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
                     conn.disconnect();
                     try {
-                        JSONArray mat = new JSONArray(output);
-                        for(int i = 0; i < mat.length(); i++){
-                            JSONObject jsonObject = mat.getJSONObject(i);
-                            int id = jsonObject.getInt("id");
-                            String name = jsonObject.getString("name");
-                            String desc = jsonObject.getString("description");
-                            Float geoLat = (float)jsonObject.getDouble("geoLat");
-                            Float geoLng = (float)jsonObject.getDouble("geoLng");
 
+                        JSONObject jsonObject = new JSONObject(output);
 
-                            Log.d("MapsActivity", "name in Background: " + name);
-                            Log.d("MapsActivity", "desc in Background: " + desc);
-                            Log.d("MapsActivity","geoLat in Background: " + geoLat);
-                            Log.d("MapsActivity","geoLng in Background: " + geoLng);
+                        List<Building> allBuildings = new ArrayList<>();
 
-                            Room room = new Room();
-                            room.setId(id);
-                            room.setName(name);
-                            room.setDesc(desc);
-                            room.setGeoLat(geoLat);
-                            room.setGeoLng(geoLng);
+                        JSONArray buildingArray = jsonObject.getJSONArray("buildings");
 
-                            rooms.add(room);
-                            //retur = retur + name + "\n";
+                        for(int i = 0; i < buildingArray.length(); i++) {
+
+                            JSONObject buildingObject = buildingArray.getJSONObject(i);
+                            Building building = new Building();
+                            building.setId(buildingObject.getInt("id"));
+                            building.setAddress(buildingObject.getString("address"));
+                            building.setGeoLat((float)buildingObject.getDouble("geoLat"));
+                            building.setGeoLng((float)buildingObject.getDouble("geoLng"));
+
+                            allBuildings.add(building);
                         }
-                        return rooms;
+
+                        List<Room> allRooms = new ArrayList<>();
+
+                        JSONArray roomArray = jsonObject.getJSONArray("rooms");
+
+                        for(int i = 0; i < roomArray.length(); i++){
+                            JSONObject roomObject = roomArray.getJSONObject(i);
+                            Room room = new Room();
+                            room.setId(roomObject.getInt("id"));
+                            room.setName(roomObject.getString("name"));
+                            room.setDesc(roomObject.getString("description"));
+
+                            for(Building building : allBuildings){
+                                if(building.getId() == roomObject.getInt("buildingId")){
+                                    room.setBuilding(building);
+                                }
+                            }
+                            allRooms.add(room);
+                        }
+
+
+
+                        List<Reservation> allReservations = new ArrayList<>();
+                        JSONArray reservationArray = jsonObject.getJSONArray("reservations");
+
+                        for(int i = 0; i < reservationArray.length(); i++){
+                            JSONObject reservationObject = reservationArray.getJSONObject(i);
+                            Reservation reservation = new Reservation();
+                            reservation.setId(reservationObject.getInt("id"));
+
+                            Date startDate = new SimpleDateFormat("dd/MM/yyyy").parse(reservationObject.getString("start"));
+                            reservation.setStart(startDate);
+                            Date finishedDate = (new SimpleDateFormat("dd/MM/yyyy").parse(reservationObject.getString("finished")));
+                            reservation.setFinished(finishedDate);
+
+                            for(Room room : allRooms){
+                                if(room.getId() == reservationObject.getInt("roomId")){
+                                    reservation.setRoom(room);
+                                }
+                            }
+                        }
+
+
+
+
+
+
+//                        JSONArray mat = new JSONArray(output);
+//                        for(int i = 0; i < mat.length(); i++){
+//                            JSONObject jsonObject = mat.getJSONObject(i);
+//                            int id = jsonObject.getInt("id");
+//                            String name = jsonObject.getString("name");
+//                            String desc = jsonObject.getString("description");
+//                            Float geoLat = (float)jsonObject.getDouble("geoLat");
+//                            Float geoLng = (float)jsonObject.getDouble("geoLng");
+//
+//
+//                            Log.d("MapsActivity", "name in Background: " + name);
+//                            Log.d("MapsActivity", "desc in Background: " + desc);
+//                            Log.d("MapsActivity","geoLat in Background: " + geoLat);
+//                            Log.d("MapsActivity","geoLng in Background: " + geoLng);
+//
+//                            Room room = new Room();
+//                            room.setId(id);
+//                            room.setName(name);
+//                            room.setDesc(desc);
+//
+//
+//                            rooms.add(room);
+//                            //retur = retur + name + "\n";
+//                        }
+////                        return rooms;
                     } catch (JSONException e){
                         e.printStackTrace();
                     }
@@ -230,8 +296,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             for(Room room : ss){
                 Log.d("MapsActivity","name in Execute: " + room.getName());
                 Log.d("MapsActivity","desc in Execute: " + room.getDesc());
-                Log.d("MapsActivity","geoLat in Execute: " + room.getGeoLat());
-                Log.d("MapsActivity","geoLng in Execute: " + room.getGeoLng());
             }
         }
     }
@@ -245,6 +309,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         Log.d("MapsActivity", "No room with that ID");
         return null;
     }
+
+
 
 
     /*

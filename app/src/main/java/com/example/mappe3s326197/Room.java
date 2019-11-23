@@ -6,8 +6,15 @@ public class Room {
     private int id;
     private String name;
     private String desc;
-    private float geoLat;
-    private float geoLng;
+    private Building building;
+
+    public Building getBuilding(){
+        return building;
+    }
+
+    public void setBuilding(Building building){
+        this.building = building;
+    }
 
 
 
@@ -34,19 +41,4 @@ public class Room {
         this.desc = desc;
     }
 
-    public float getGeoLat() {
-        return geoLat;
-    }
-
-    public void setGeoLat(float geoLat) {
-        this.geoLat = geoLat;
-    }
-
-    public float getGeoLng() {
-        return geoLng;
-    }
-
-    public void setGeoLng(float geoLng) {
-        this.geoLng = geoLng;
-    }
 }
