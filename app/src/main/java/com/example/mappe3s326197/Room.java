@@ -1,11 +1,15 @@
 package com.example.mappe3s326197;
 
+import java.util.List;
+
 public class Room {
     private int id;
     private String name;
     private String desc;
     private float geoLat;
     private float geoLng;
+
+
 
     public int getId(){
         return id;

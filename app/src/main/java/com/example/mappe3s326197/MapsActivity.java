@@ -2,6 +2,8 @@ package com.example.mappe3s326197;
 
 import androidx.fragment.app.FragmentActivity;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
@@ -22,11 +24,9 @@ import org.json.JSONObject;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
-import java.lang.reflect.Array;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
@@ -34,6 +34,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private GoogleMap mMap;
     TextView textView;
     private List<Room> rooms = new ArrayList<>();
+    private List<Reservation> reservations = new ArrayList<>();
     private List<LatLng> allPoints = new ArrayList<>();
     Marker currentMarker = null;
 
@@ -121,6 +122,31 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     marker.showInfoWindow();
                     Log.d("MapsActivity", "This is a room");
                 }else{
+
+                    AlertDialog.Builder builder1 = new AlertDialog.Builder(MapsActivity.this);
+                    builder1.setMessage("Vil du registrere et nytt rom her?");
+                    builder1.setCancelable(true);
+
+                    builder1.setPositiveButton(
+                            "Ja",
+                            new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int id) {
+                                    Log.d("MapsActivity", "Clicked Yes");
+                                    dialog.cancel();
+                                }
+                            });
+
+                    builder1.setNegativeButton(
+                            "Nei",
+                            new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int id) {
+                                    Log.d("MapsActivity", "Clicked No");
+                                    dialog.cancel();
+                                }
+                            });
+
+                    AlertDialog alert11 = builder1.create();
+                    alert11.show();
                     Log.d("MapsActivity", "This marker does not have a tag. It can become a room.");
                 }
                 return true;
@@ -220,6 +246,18 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         return null;
     }
 
+
+    /*
+    public List<Reservation> getReservationsByRoomId(int id){
+        List<Reservation> roomReservations = new ArrayList<>();
+        for(Reservation reservation : reservations ) {
+            if(reservation.getRoom().getId() == id){
+                roomReservations.add(reservation);
+            }
+        }
+        return roomReservations;
+    }
+    */
 }
 
 
