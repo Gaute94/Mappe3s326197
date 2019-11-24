@@ -42,6 +42,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     TextView textView;
     private JsonData jsonData = new JsonData();
     private List<LatLng> allPoints = new ArrayList<>();
+    Marker selectedMarker = null;
 
 
     Marker currentMarker = null;
@@ -128,6 +129,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
                 if(marker.getTag() != null){
                     marker.showInfoWindow();
+                    selectedMarker = marker;
                     Log.d("MapsActivity", "This is a room");
                 }else{
 
@@ -148,8 +150,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                             "Nei",
                             new DialogInterface.OnClickListener() {
                                 public void onClick(DialogInterface dialog, int id) {
+
                                     Log.d("MapsActivity", "Clicked No");
                                     dialog.cancel();
+
                                 }
                             });
 
@@ -163,13 +167,13 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         });
     }
 
-    public void addBuilding(View view){
-
-        //Denne er brukbar man skal legge til rom på en eksisterende bygning!
-        //Building building = jsonData.findBuildingByCoordinates(currentMarker.getPosition());
+    public void viewRooms(){
         AlertDialog.Builder builder1 = new AlertDialog.Builder(MapsActivity.this);
+        if(selectedMarker != null) {
+            Building building = jsonData.findBuildingByCoordinates(selectedMarker.getPosition());
+            builder1.setMessage(building.getAddress());
 
-        builder1.setMessage("Vil du registrere en ny bygning her?");
+        }
         builder1.setCancelable(true);
 
         builder1.setPositiveButton(
@@ -190,6 +194,50 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     }
                 });
 
+        AlertDialog alert11 = builder1.create();
+        alert11.show();
+    }
+
+    public void addBuilding(View view){
+
+        //Denne er brukbar man skal legge til rom på en eksisterende bygning!
+        //Building building = jsonData.findBuildingByCoordinates(currentMarker.getPosition());
+        AlertDialog.Builder builder1 = new AlertDialog.Builder(MapsActivity.this);
+
+        if(currentMarker == null){
+            builder1.setMessage("Du må velge et punkt på kartet først.");
+            builder1.setCancelable(true);
+
+            builder1.setNeutralButton("Ok",new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int id) {
+                    Log.d("MapsActivity", "Clicked Ok");
+                    dialog.cancel();
+                }
+            });
+        }else {
+            builder1.setMessage("Vil du registrere en ny bygning her?");
+            builder1.setCancelable(true);
+
+            builder1.setPositiveButton(
+                    "Ja",
+                    new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int id) {
+                            Log.d("MapsActivity", "Clicked Yes");
+                            dialog.cancel();
+                        }
+                    });
+
+            builder1.setNegativeButton(
+                    "Nei",
+                    new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int id) {
+                            currentMarker.remove();
+                            currentMarker=null;
+                            Log.d("MapsActivity", "Clicked No");
+                            dialog.cancel();
+                        }
+                    });
+        }
         AlertDialog alert11 = builder1.create();
         alert11.show();
         Log.d("MapsActivity", "This marker does not have a tag. It can become a room.");
