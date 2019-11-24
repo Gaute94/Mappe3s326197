@@ -19,4 +19,13 @@
         android:layout_height="wrap_content"
         android:onClick="addMarker"
         android:text="Add Marker"/>
+
+    <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
+        android:id="@+id/fab"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal|bottom"
+        android:text="OK"
+        android:onClick="addBuilding"
+        android:layout_margin="16dp" />
 </FrameLayout>

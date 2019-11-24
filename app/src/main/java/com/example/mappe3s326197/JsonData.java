@@ -2,6 +2,8 @@ package com.example.mappe3s326197;
 
 import android.util.Log;
 
+import com.google.android.gms.maps.model.LatLng;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -29,6 +31,15 @@ public class JsonData {
             Log.d(TAG, "printAllData: inside reservation");
             Log.d(TAG, "printAllData: Reservation Id");
         }
+    }
+
+    public Building findBuildingByCoordinates(LatLng latLng){
+        for(Building building : buildings){
+            if(building.getGeoLat() == latLng.latitude && building.getGeoLng() == latLng.longitude){
+                return building;
+            }
+        }
+        return null;
     }
 
     public List<Building> getBuildings() {

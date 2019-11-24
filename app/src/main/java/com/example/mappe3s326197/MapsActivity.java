@@ -7,7 +7,12 @@ import android.content.DialogInterface;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Gravity;
+import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
+import android.widget.LinearLayout;
+import android.widget.PopupWindow;
 import android.widget.TextView;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -35,11 +40,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     private GoogleMap mMap;
     TextView textView;
-    private List<Room> rooms = new ArrayList<>();
-    private List<Reservation> reservations = new ArrayList<>();
-    private List<LatLng> allPoints = new ArrayList<>();
-    private List<Building> buildings = new ArrayList<>();
     private JsonData jsonData = new JsonData();
+    private List<LatLng> allPoints = new ArrayList<>();
+
+
     Marker currentMarker = null;
 
     @Override
@@ -63,7 +67,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
 
     public void addMarker(View view){
-        for(Building building : buildings){
+
+        for(Building building : jsonData.getBuildings()){
             Log.d("MapsActivity", "Building Address: " + building.getAddress());
             Marker marker = mMap.addMarker(new MarkerOptions()
                     .position(new LatLng(building.getGeoLat(), building.getGeoLng()))
@@ -158,6 +163,38 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         });
     }
 
+    public void addBuilding(View view){
+
+        //Denne er brukbar man skal legge til rom på en eksisterende bygning!
+        //Building building = jsonData.findBuildingByCoordinates(currentMarker.getPosition());
+        AlertDialog.Builder builder1 = new AlertDialog.Builder(MapsActivity.this);
+
+        builder1.setMessage("Vil du registrere en ny bygning her?");
+        builder1.setCancelable(true);
+
+        builder1.setPositiveButton(
+                "Ja",
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        Log.d("MapsActivity", "Clicked Yes");
+                        dialog.cancel();
+                    }
+                });
+
+        builder1.setNegativeButton(
+                "Nei",
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        Log.d("MapsActivity", "Clicked No");
+                        dialog.cancel();
+                    }
+                });
+
+        AlertDialog alert11 = builder1.create();
+        alert11.show();
+        Log.d("MapsActivity", "This marker does not have a tag. It can become a room.");
+    }
+
 
     private class GetJSON extends AsyncTask<String, Void, JsonData> {
 
@@ -226,8 +263,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                             }
                             allRooms.add(room);
                         }
-
-
 
                         List<Reservation> allReservations = new ArrayList<>();
                         JSONArray reservationArray = jsonObject.getJSONArray("reservations");
@@ -303,17 +338,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         }
     }
-
-    public Room findRoomById(int id){
-        for(Room room : rooms){
-            if (room.getId() == id){
-                return room;
-            }
-        }
-        Log.d("MapsActivity", "No room with that ID");
-        return null;
-    }
-
 
 
 
