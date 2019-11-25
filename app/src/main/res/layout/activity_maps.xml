@@ -19,6 +19,13 @@
         android:layout_height="wrap_content"
         android:onClick="addMarker"
         android:text="Add Marker"/>
+    <Button
+        android:id="@+id/viewRoomsButton"
+        android:layout_width="80dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="100dp"
+        android:onClick="onButtonShowPopupWindowClick"
+        android:text="View Rooms"/>
 
     <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
         android:id="@+id/fab"

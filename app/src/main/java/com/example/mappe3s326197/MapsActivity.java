@@ -3,6 +3,7 @@ package com.example.mappe3s326197;
 import androidx.fragment.app.FragmentActivity;
 
 import android.app.AlertDialog;
+import android.app.Dialog;
 import android.content.DialogInterface;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -11,7 +12,10 @@ import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
+import android.widget.Adapter;
+import android.widget.Button;
 import android.widget.LinearLayout;
+import android.widget.ListView;
 import android.widget.PopupWindow;
 import android.widget.TextView;
 
@@ -43,9 +47,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private JsonData jsonData = new JsonData();
     private List<LatLng> allPoints = new ArrayList<>();
     Marker selectedMarker = null;
-
-
+    ListView roomList;
+    Button showRoomsButton;
     Marker currentMarker = null;
+    RoomAdapter roomAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -63,7 +68,23 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         task.execute("http://student.cs.hioa.no/~s326197/getJson.php");
 
 
-
+//        showRoomsButton = (Button) findViewById(R.id.viewRoomsButton);
+//
+//        showRoomsButton.setOnClickListener( new View.OnClickListener() {
+//
+//            @Override
+//            public void onClick(View v) {
+//
+//                final Dialog dialog = new Dialog(MapsActivity.this);
+//                dialog.setContentView(R.layout.custom_dialog);
+//                dialog.setTitle("Title...");
+//                roomList= (ListView) dialog.findViewById(R.id.List);
+//                roomAdapter = new RoomAdapter(MapsActivity.this, 0, jsonData.getRooms());
+//                roomList.setAdapter(roomAdapter);
+//                dialog.show();
+//
+//            }
+//        });
     }
 
 
@@ -128,9 +149,22 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             public boolean onMarkerClick(Marker marker) {
 
                 if(marker.getTag() != null){
+
+                    Building building = jsonData.findBuildingByCoordinates(marker.getPosition());
+                    List<Room> roomsInBuilding = jsonData.findRoomsByBuildingId(building.getId());
+
                     marker.showInfoWindow();
                     selectedMarker = marker;
                     Log.d("MapsActivity", "This is a room");
+                    final Dialog dialog = new Dialog(MapsActivity.this);
+                    dialog.setContentView(R.layout.listview_dialog);
+                    dialog.setTitle("Title...");
+                    roomList= (ListView) dialog.findViewById(R.id.List);
+                    roomAdapter = new RoomAdapter(MapsActivity.this, 0, roomsInBuilding);
+                    roomList.setAdapter(roomAdapter);
+                    dialog.show();
+
+
                 }else{
 
                     AlertDialog.Builder builder1 = new AlertDialog.Builder(MapsActivity.this);
@@ -241,6 +275,33 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         AlertDialog alert11 = builder1.create();
         alert11.show();
         Log.d("MapsActivity", "This marker does not have a tag. It can become a room.");
+    }
+
+    public void onButtonShowPopupWindowClick(View view) {
+
+        // inflate the layout of the popup window
+        LayoutInflater inflater = (LayoutInflater)
+                getSystemService(LAYOUT_INFLATER_SERVICE);
+        View popupView = inflater.inflate(R.layout.popup_window, null);
+
+        // create the popup window
+        int width = LinearLayout.LayoutParams.WRAP_CONTENT;
+        int height = LinearLayout.LayoutParams.WRAP_CONTENT;
+        boolean focusable = true; // lets taps outside the popup also dismiss it
+        final PopupWindow popupWindow = new PopupWindow(popupView, width, height, focusable);
+
+        // show the popup window
+        // which view you pass in doesn't matter, it is only used for the window tolken
+        popupWindow.showAtLocation(view, Gravity.CENTER, 0, 0);
+
+        // dismiss the popup window when touched
+        popupView.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                popupWindow.dismiss();
+                return true;
+            }
+        });
     }
 
 

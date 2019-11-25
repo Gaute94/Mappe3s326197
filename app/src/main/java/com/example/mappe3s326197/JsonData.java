@@ -42,6 +42,16 @@ public class JsonData {
         return null;
     }
 
+    public List<Room> findRoomsByBuildingId(int id){
+        List<Room> buildingRooms = new ArrayList<>();
+        for(Room room : rooms){
+            if(room.getBuilding().getId() == id){
+                buildingRooms.add(room);
+            }
+        }
+        return buildingRooms;
+    }
+
     public List<Building> getBuildings() {
         return buildings;
     }
