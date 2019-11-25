@@ -19,6 +19,7 @@ import java.util.List;
 public class RoomAdapter extends ArrayAdapter<Room> {
 
     private Context context;
+    private JsonData jsonData;
     private List<Room> rooms;
     //private DBHandler dbHandler;
 
@@ -40,6 +41,14 @@ public class RoomAdapter extends ArrayAdapter<Room> {
         TextView name = (TextView) convertView.findViewById(R.id.name);
         TextView description = (TextView) convertView.findViewById(R.id.description);
 
+        Button button = (Button) convertView.findViewById(R.id.view_reservations_button);
+        button.setOnClickListener(new View.OnClickListener() {
+              @Override
+              public void onClick(View view) {
+
+
+              }
+          });
 //        button.setOnClickListener(new View.OnClickListener() {
 //            @Override
 //            public void onClick(View view) {

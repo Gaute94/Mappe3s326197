@@ -1,5 +1,7 @@
 package com.example.mappe3s326197;
 
+import android.os.Parcel;
+import android.os.Parcelable;
 import android.util.Log;
 
 import com.google.android.gms.maps.model.LatLng;
@@ -9,12 +11,44 @@ import java.util.List;
 
 import static android.content.ContentValues.TAG;
 
-public class JsonData {
+public class JsonData implements Parcelable {
 
     private List<Building> buildings = new ArrayList<>();
     private List<Room> rooms = new ArrayList<>();
     private List<Reservation> reservations = new ArrayList<>();
 
+
+    public JsonData(){}
+
+    protected JsonData(Parcel in) {
+        buildings = in.createTypedArrayList(Building.CREATOR);
+        rooms = in.createTypedArrayList(Room.CREATOR);
+        reservations = in.createTypedArrayList(Reservation.CREATOR);
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeTypedList(buildings);
+        dest.writeTypedList(rooms);
+        dest.writeTypedList(reservations);
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    public static final Creator<JsonData> CREATOR = new Creator<JsonData>() {
+        @Override
+        public JsonData createFromParcel(Parcel in) {
+            return new JsonData(in);
+        }
+
+        @Override
+        public JsonData[] newArray(int size) {
+            return new JsonData[size];
+        }
+    };
 
     public void printAllData(){
         for(Building building : buildings){

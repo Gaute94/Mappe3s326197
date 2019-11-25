@@ -4,33 +4,25 @@
     android:layout_height="match_parent">
 
     <TextView
-        android:id="@+id/name"
+        android:id="@+id/start"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentStart="true"
         android:layout_marginStart="30dp"
-        android:text="Gaute Kvalheim"
+        android:text="12:15"
         android:textSize="16sp"/>
 
     <TextView
-        android:id="@+id/description"
+        android:id="@+id/finished"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentStart="true"
         android:layout_marginStart="30dp"
-        android:layout_below="@+id/name"
-        android:textSize="12sp"
-        android:text="91361611"/>
+        android:layout_below="@+id/start"
+        android:textSize="16sp"
+        android:text="14:45"/>
 
-    <Button
-        android:id="@+id/view_reservations_button"
-        android:layout_alignParentEnd="true"
-        android:layout_width="wrap_content"
-        android:layout_centerVertical="true"
-        android:layout_height="match_parent"
-        android:textSize="14sp"
-        android:onClick="showReservations"
-        style="?android:attr/borderlessButtonStyle"/>
+
 
 
 </RelativeLayout>

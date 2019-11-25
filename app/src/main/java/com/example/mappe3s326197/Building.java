@@ -1,10 +1,47 @@
 package com.example.mappe3s326197;
 
-public class Building {
+import android.os.Parcel;
+import android.os.Parcelable;
+
+public class Building implements Parcelable {
     private int id;
     private String address;
     private float geoLat;
     private float geoLng;
+
+    public Building(){}
+
+    protected Building(Parcel in) {
+        id = in.readInt();
+        address = in.readString();
+        geoLat = in.readFloat();
+        geoLng = in.readFloat();
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeInt(id);
+        dest.writeString(address);
+        dest.writeFloat(geoLat);
+        dest.writeFloat(geoLng);
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    public static final Creator<Building> CREATOR = new Creator<Building>() {
+        @Override
+        public Building createFromParcel(Parcel in) {
+            return new Building(in);
+        }
+
+        @Override
+        public Building[] newArray(int size) {
+            return new Building[size];
+        }
+    };
 
     public int getId() {
         return id;

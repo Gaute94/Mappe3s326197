@@ -5,6 +5,7 @@ import androidx.fragment.app.FragmentActivity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
@@ -13,6 +14,7 @@ import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Adapter;
+import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.ListView;
@@ -164,6 +166,13 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     roomList.setAdapter(roomAdapter);
                     dialog.show();
 
+//                    roomList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+//                        @Override
+//                        public void onItemClick(AdapterView<?> parent, View view,int position, long id) {
+//
+//                        }
+//                    });
+
 
                 }else{
 
@@ -199,6 +208,20 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
             }
         });
+    }
+
+    public void showReservations(View view){
+
+        Intent myIntent = new Intent(MapsActivity.this, ReservationsActivity.class);
+        myIntent.putExtra("JsonData", jsonData);
+
+        MapsActivity.this.startActivity(myIntent);
+    }
+
+    private void startNewActivity(Class myclass){
+        Intent myIntent = new Intent(MapsActivity.this, myclass);
+        myIntent.putExtra("JsonData", jsonData);
+        MapsActivity.this.startActivity(myIntent);
     }
 
     public void viewRooms(){
