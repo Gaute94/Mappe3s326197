@@ -41,12 +41,13 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
 
     private GoogleMap mMap;
     TextView textView;
-    private JsonData jsonData = new JsonData();
+    private JsonData JSONData = new JsonData();
     private List<LatLng> allPoints = new ArrayList<>();
     Marker selectedMarker = null;
     ListView roomList;
@@ -91,8 +92,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
 
     public void addMarker(View view){
-
-        for(Building building : jsonData.getBuildings()){
+        System.out.println("Inside addMarker");;
+        for(Building building : JSONData.getBuildings()){
             Log.d("MapsActivity", "Building Address: " + building.getAddress());
             Marker marker = mMap.addMarker(new MarkerOptions()
                     .position(new LatLng(building.getGeoLat(), building.getGeoLng()))
@@ -152,8 +153,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
                 if(marker.getTag() != null){
 
-                    Building building = jsonData.findBuildingByCoordinates(marker.getPosition());
-                    List<Room> roomsInBuilding = jsonData.findRoomsByBuildingId(building.getId());
+                    final Building building = JSONData.findBuildingByCoordinates(marker.getPosition());
+                    final List<Room> roomsInBuilding = JSONData.findRoomsByBuildingId(building.getId());
 
                     marker.showInfoWindow();
                     selectedMarker = marker;
@@ -161,7 +162,56 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     final Dialog dialog = new Dialog(MapsActivity.this);
                     dialog.setContentView(R.layout.listview_dialog);
                     dialog.setTitle("Title...");
+
                     roomList= (ListView) dialog.findViewById(R.id.List);
+
+                    TextView buildingAddress = (TextView) dialog.findViewById(R.id.building_address);
+                    buildingAddress.setText(building.getAddress());
+                    roomList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                        @Override
+                        public void onItemClick(AdapterView<?> adapterView, View view, final int i, final long l) {
+
+                            AlertDialog.Builder builder1 = new AlertDialog.Builder(MapsActivity.this);
+                            builder1.setMessage("Hva vil du gjøre?");
+                            builder1.setCancelable(true);
+                            builder1.setPositiveButton(
+                                    "Reserver rom",
+                                    new DialogInterface.OnClickListener() {
+                                        public void onClick(DialogInterface dialog, int id) {
+                                            Log.d("MapsActivity", "Clicked Reserver.");
+                                            dialog.cancel();
+                                        }
+                                    });
+
+                            builder1.setNegativeButton(
+                                    "Se reservasjoner",
+                                    new DialogInterface.OnClickListener() {
+                                        public void onClick(DialogInterface dialog, int id) {
+
+                                            Log.d("MapsActivity", "Clicked Se Reservasjoner");
+                                            Intent intent = new Intent(getApplicationContext(),ReservationsActivity.class);
+                                            Log.d("MapsActivity", "What I think is room id: " + l);
+                                            Log.d("MapsActivity", "What might be the position in list: " + i);
+
+                                            intent.putExtra("roomId", (int)l);
+                                            intent.putExtra("building", building);
+                                            intent.putExtra("jsonData", JSONData);
+                                            startActivity(intent);
+                                            dialog.cancel();
+
+                                        }
+                                    });
+
+                            AlertDialog alert11 = builder1.create();
+                            alert11.show();
+
+
+
+
+                        }
+                    });
+
+
                     roomAdapter = new RoomAdapter(MapsActivity.this, 0, roomsInBuilding);
                     roomList.setAdapter(roomAdapter);
                     dialog.show();
@@ -213,21 +263,22 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     public void showReservations(View view){
 
         Intent myIntent = new Intent(MapsActivity.this, ReservationsActivity.class);
-        myIntent.putExtra("JsonData", jsonData);
+        myIntent.putExtra("JsonData", JSONData);
+
 
         MapsActivity.this.startActivity(myIntent);
     }
 
     private void startNewActivity(Class myclass){
         Intent myIntent = new Intent(MapsActivity.this, myclass);
-        myIntent.putExtra("JsonData", jsonData);
+        myIntent.putExtra("JsonData", JSONData);
         MapsActivity.this.startActivity(myIntent);
     }
 
     public void viewRooms(){
         AlertDialog.Builder builder1 = new AlertDialog.Builder(MapsActivity.this);
         if(selectedMarker != null) {
-            Building building = jsonData.findBuildingByCoordinates(selectedMarker.getPosition());
+            Building building = JSONData.findBuildingByCoordinates(selectedMarker.getPosition());
             builder1.setMessage(building.getAddress());
 
         }
@@ -302,22 +353,17 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     public void onButtonShowPopupWindowClick(View view) {
 
-        // inflate the layout of the popup window
         LayoutInflater inflater = (LayoutInflater)
                 getSystemService(LAYOUT_INFLATER_SERVICE);
         View popupView = inflater.inflate(R.layout.popup_window, null);
 
-        // create the popup window
         int width = LinearLayout.LayoutParams.WRAP_CONTENT;
         int height = LinearLayout.LayoutParams.WRAP_CONTENT;
-        boolean focusable = true; // lets taps outside the popup also dismiss it
+        boolean focusable = true;
         final PopupWindow popupWindow = new PopupWindow(popupView, width, height, focusable);
 
-        // show the popup window
-        // which view you pass in doesn't matter, it is only used for the window tolken
         popupWindow.showAtLocation(view, Gravity.CENTER, 0, 0);
 
-        // dismiss the popup window when touched
         popupView.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
@@ -404,9 +450,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                             Reservation reservation = new Reservation();
                             reservation.setId(reservationObject.getInt("id"));
 
-                            Date startDate = new SimpleDateFormat("dd/MM/yyyy").parse(reservationObject.getString("start"));
+                            Date startDate = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.US).parse(reservationObject.getString("start"));
                             reservation.setStart(startDate);
-                            Date finishedDate = (new SimpleDateFormat("dd/MM/yyyy").parse(reservationObject.getString("finished")));
+                            Date finishedDate = (new SimpleDateFormat( "yyyy-MM-dd HH:mm:ss", Locale.US).parse(reservationObject.getString("finished")));
                             reservation.setFinished(finishedDate);
 
                             for(Room room : allRooms){
@@ -420,7 +466,15 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                         jsonData.setRooms(allRooms);
                         jsonData.setReservations(allReservations);
 
-
+                        for(Room room : allRooms){
+                            Log.d("MapsActivity", "doInBackground room name: " + room.getName());
+                        }
+                        for(Building building : allBuildings){
+                            Log.d("MapsActivity", "doInBackground building address: " + building.getAddress());
+                        }
+                        for(Reservation reservation : allReservations){
+                            Log.d("MapsActivity", "doInBackground reservations: " + reservation.getId());
+                        }
 
 
 
@@ -462,11 +516,14 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         }
 
         @Override
-        protected void onPostExecute(JsonData ss){
+        protected void onPostExecute(JsonData jsonData){
+
+            jsonData.printAllData();
+            JSONData = jsonData;
             //textView.setText(ss);
 //            rooms.addAll(ss);
-            jsonData = ss;
-            jsonData.printAllData();
+//            JSONData = ss;
+//            JSONData.printAllData();
 
         }
     }
