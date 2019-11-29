@@ -13,7 +13,6 @@ import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
-import android.widget.Adapter;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.LinearLayout;
@@ -21,6 +20,11 @@ import android.widget.ListView;
 import android.widget.PopupWindow;
 import android.widget.TextView;
 
+import com.example.mappe3s326197.adapter.RoomAdapter;
+import com.example.mappe3s326197.models.Building;
+import com.example.mappe3s326197.models.JsonData;
+import com.example.mappe3s326197.models.Reservation;
+import com.example.mappe3s326197.models.Room;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -54,6 +58,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     Button showRoomsButton;
     Marker currentMarker = null;
     RoomAdapter roomAdapter;
+    Building currentBuilding;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -101,6 +106,15 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             marker.setTag(building.getId());
         }
 
+    }
+
+    public void addRoom(View view){
+        Intent intent = new Intent(getApplicationContext(),ReservationsActivity.class);
+        Log.d("MapsActivity", "Inside addRoom");
+
+        intent.putExtra("jsonData", JSONData);
+        intent.putExtra("building", currentBuilding);
+        startActivity(intent);
     }
 
 
@@ -155,7 +169,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
                     final Building building = JSONData.findBuildingByCoordinates(marker.getPosition());
                     final List<Room> roomsInBuilding = JSONData.findRoomsByBuildingId(building.getId());
-
+                    currentBuilding = building;
                     marker.showInfoWindow();
                     selectedMarker = marker;
                     Log.d("MapsActivity", "This is a room");
@@ -164,6 +178,13 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     dialog.setTitle("Title...");
 
                     roomList= (ListView) dialog.findViewById(R.id.List);
+                    Button addRoomButton = dialog.findViewById(R.id.add_room_button);
+                    addRoomButton.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View view) {
+                            addRoom(view);
+                        }
+                    });
 
                     TextView buildingAddress = (TextView) dialog.findViewById(R.id.building_address);
                     buildingAddress.setText(building.getAddress());

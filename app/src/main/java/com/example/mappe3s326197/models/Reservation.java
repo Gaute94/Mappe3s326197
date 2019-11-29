@@ -1,4 +1,4 @@
-package com.example.mappe3s326197;
+package com.example.mappe3s326197.models;
 
 import android.os.Parcel;
 import android.os.Parcelable;

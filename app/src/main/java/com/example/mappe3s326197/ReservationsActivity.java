@@ -8,7 +8,11 @@ import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import org.w3c.dom.Text;
+import com.example.mappe3s326197.adapter.ReservationAdapter;
+import com.example.mappe3s326197.models.Building;
+import com.example.mappe3s326197.models.JsonData;
+import com.example.mappe3s326197.models.Reservation;
+import com.example.mappe3s326197.models.Room;
 
 import java.util.List;
 

@@ -19,5 +19,13 @@
         android:layout_width="match_parent"
         android:layout_height="250dp" >
     </ListView>
+    <Button
+        android:id="@+id/add_room_button"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="+"
+        android:textSize="22sp"
+        android:onClick="addBuilding"
+        />
 
 </LinearLayout>

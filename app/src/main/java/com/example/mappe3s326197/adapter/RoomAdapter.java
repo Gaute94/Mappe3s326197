@@ -1,50 +1,71 @@
-package com.example.mappe3s326197;
+package com.example.mappe3s326197.adapter;
 
 import android.app.Activity;
 import android.content.Context;
-import android.content.Intent;
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
-import android.widget.Button;
-import android.widget.ImageButton;
-import android.widget.PopupMenu;
 import android.widget.TextView;
 
-import java.util.ArrayList;
+import androidx.annotation.Nullable;
+
+import com.example.mappe3s326197.models.JsonData;
+import com.example.mappe3s326197.R;
+import com.example.mappe3s326197.models.Room;
+
 import java.util.List;
 
-public class ReservationAdapter extends ArrayAdapter<Reservation> {
+public class RoomAdapter extends ArrayAdapter<Room> {
 
     private Context context;
     private JsonData jsonData;
-    private List<Reservation> reservations;
-
+    private List<Room> rooms;
+    private int roomId;
     //private DBHandler dbHandler;
 
-    public ReservationAdapter(Context context, int resource, List<Reservation> reservations){
-        super(context, resource, reservations);
+    public RoomAdapter(Context context, int resource, List<Room> rooms){
+        super(context, resource, rooms);
         this.context = context;
-        this.reservations = reservations;
+        this.rooms = rooms;
         //dbHandler = new DBHandler(context);
     }
 
+    @Override
+    public long getItemId(int position) {
+        Log.d("RoomAdapter", "Inside getItemId. Position: " + position + ", ID: " + getItem(position).getId());
+        return getItem(position).getId();
+    }
+
+    @Nullable
+    @Override
+    public Room getItem(int position) {
+        Log.d("RoomAdapter", "Inside getItem. Position: " + position);
+        return rooms.get(position);
+    }
+
     public View getView(int position, View convertView, ViewGroup parent){
-        final Reservation reservation = reservations.get(position);
+        final Room room = rooms.get(position);
 
         if(convertView == null) {
             LayoutInflater inflater = (LayoutInflater) context.getSystemService(Activity.LAYOUT_INFLATER_SERVICE);
             convertView = inflater.inflate(R.layout.room_list_item, null);
         }
 
-        TextView roomName = (TextView) convertView.findViewById(R.id.roomName);
-        TextView reservationDate = (TextView) convertView.findViewById(R.id.reservation_date);
-        TextView start = (TextView)convertView.findViewById(R.id.start);
-        TextView finished = (TextView)convertView.findViewById(R.id.finished);
 
+        TextView name = (TextView) convertView.findViewById(R.id.name);
+        TextView description = (TextView) convertView.findViewById(R.id.description);
+//        ImageButton button = (ImageButton) convertView.findViewById(R.id.view_reservations_button);
+//        button.setTag(position);
+//        button.setOnClickListener(new View.OnClickListener() {
+//              @Override
+//              public void onClick(View view) {
+//                  roomId = room.getId();
+//                  Log.d("RoomAdapter", "Room.getId() in RoomAdapter: " + room.getId());
+//
+//              }
+//          });
 //        button.setOnClickListener(new View.OnClickListener() {
 //            @Override
 //            public void onClick(View view) {
@@ -71,9 +92,8 @@ public class ReservationAdapter extends ArrayAdapter<Reservation> {
 //            }
 //        });
 
-       start.setText(reservation.getStart().toString());
-       finished.setText(reservation.getFinished().toString());
-
+        name.setText(room.getName());
+        description.setText(room.getDesc());
         return convertView;
     }
 
