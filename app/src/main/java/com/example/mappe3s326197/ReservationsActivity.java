@@ -14,6 +14,7 @@ import com.example.mappe3s326197.models.JsonData;
 import com.example.mappe3s326197.models.Reservation;
 import com.example.mappe3s326197.models.Room;
 
+import java.util.Date;
 import java.util.List;
 
 public class ReservationsActivity extends AppCompatActivity {
@@ -31,28 +32,39 @@ public class ReservationsActivity extends AppCompatActivity {
         reservationListView = (ListView) findViewById(R.id.reservation_list_view);
         Intent i = getIntent();
         jsonData = (JsonData) i.getParcelableExtra("JsonData");
-        Building building = i.getParcelableExtra("building");
+        //int buildingId = i.getIntExtra("buildingId", 0);
         int roomId = i.getIntExtra("roomId", 0);
-
-        List<Room> roomsInBuilding = jsonData.findRoomsByBuildingId(building.getId());
-
-
-
-        room = roomsInBuilding.get(roomId);
-        if(room != null){
-            Log.d("ReservationsActivity", "room is not null!");
-        }else{
-            Log.d("ReservationsActivity", "room IS NULL!!!");
-        }
+        room = jsonData.findRoomById(roomId);
+//        List<Room> roomsInBuilding = jsonData.findRoomsByBuildingId(buildingId);
+//
+//
+//
+//        room = roomsInBuilding.get(roomId);
+//        if(room != null){
+//            Log.d("ReservationsActivity", "room is not null!");
+//        }else{
+//            Log.d("ReservationsActivity", "room IS NULL!!!");
+//        }
         roomName = (TextView)findViewById(R.id.roomName);
         reservationDate = (TextView)findViewById(R.id.reservation_date);
 
         List<Reservation> reservations = jsonData.findReservationsByRoomId(roomId);
 
         roomName.setText(room.getName());
+
         reservationDate.setText("DID IT");
 
-        ReservationAdapter reservationAdapter = new ReservationAdapter(this, 0, reservations);
+        Log.d("ReservationsActivity", "Room ID: " + roomId);
+        Log.d("ReservationsActivity", "Room Name: " + room.getName());
+        if(reservations.size() == 0){
+            Log.d("ReservationsActivity", "Reservations == 0");
+        }
+        for(Reservation reservation : reservations){
+            Log.d("ReservationsActivity", "Room reservation: " + reservation.getId());
+            Log.d("ReservationsActivity", "Room reservationStart: " + reservation.getStart());
+
+        }
+        ReservationAdapter reservationAdapter = new ReservationAdapter(ReservationsActivity.this, 0, reservations);
         reservationListView.setAdapter(reservationAdapter);
 
 

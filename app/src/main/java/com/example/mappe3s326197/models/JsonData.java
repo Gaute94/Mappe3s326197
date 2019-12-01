@@ -87,15 +87,29 @@ public class JsonData implements Parcelable {
     }
 
     public List<Reservation> findReservationsByRoomId(int id){
+        Log.d("JsonData", "RoomId: " + id);
+
         List<Reservation> roomReservations = new ArrayList<>();
         for(Reservation reservation : reservations){
+            Log.d("JsonData", "ReservationId: " + reservation.getId());
+            Log.d("JsonData", "ReservationStart: " + reservation.getStart());
+            Log.d("JsonData", "reservation.getRoom().getId(): " + reservation.getRoom().getId());
             if(reservation.getRoom().getId() == id){
+                Log.d("JsonData", "Reservation.getRoom().getId() equals room id: " + id);
                 roomReservations.add(reservation);
             }
         }
         return roomReservations;
     }
 
+    public Room findRoomById(int id){
+        for(Room room : rooms){
+            if(room.getId() == id){
+                return room;
+            }
+        }
+        return null;
+    }
     public List<Building> getBuildings() {
         return buildings;
     }

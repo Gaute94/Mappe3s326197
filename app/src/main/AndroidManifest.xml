@@ -39,6 +39,8 @@
             </intent-filter>
         </activity>
         <activity android:name=".ReservationsActivity"></activity>
+        <activity android:name=".AddRoomActivity"></activity>
+        <activity android:name=".AddBuildingActivity"></activity>
     </application>
 
 </manifest>

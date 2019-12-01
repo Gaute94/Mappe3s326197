@@ -17,12 +17,16 @@ public class Reservation implements Parcelable {
     protected Reservation(Parcel in) {
         id = in.readInt();
         room = in.readParcelable(Room.class.getClassLoader());
+        start = new Date(in.readLong());
+        finished = new Date(in.readLong());
     }
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeInt(id);
         dest.writeParcelable(room, flags);
+        dest.writeLong(start.getTime());
+        dest.writeLong(finished.getTime());
     }
 
     @Override

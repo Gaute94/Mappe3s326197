@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical" android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:id="@+id/room_layout">
 
 
     <TextView
@@ -9,14 +10,31 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:textSize="14sp"/>
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textSize="12sp"
+        android:text="Navn:"/>
     <EditText
         android:id="@+id/room_name"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:textSize="14sp"/>
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textSize="12sp"
+        android:text="Beskrivelse:"/>
     <EditText
         android:id="@+id/description"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:textSize="14sp"/>
+
+    <Button
+        android:id="@+id/add_room"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:onClick="addRoom"
+        android:text="Legg til rom"/>
 </LinearLayout>
